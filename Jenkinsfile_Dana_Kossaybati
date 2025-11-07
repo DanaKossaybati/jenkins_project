@@ -35,16 +35,44 @@ pipeline {
                 }
             }
         }
+        
+        stage('Coverage') {
+            steps {
+                script {
+                    sh """
+                        source ${VIRTUAL_ENV}/Scripts/activate
+                        PYTHONPATH=. coverage run -m pytest
+                        coverage report
+                        coverage html -d coverage_html
+                    """
+                }
+            }
+        }
+
+        stage('SecurityScan') {
+            steps {
+                script {
+                    sh """
+                        source ${VIRTUAL_ENV}/Scripts/activate
+                        bandit -r .
+                    """
+                }
+            }
+        }
 
 
         stage('Deploy') {
             steps {
                 script {
-                    // Deployment logic, e.g. pushing to a remote server
-                    echo "Deploying application..."
+                    sh """
+                        source ${VIRTUAL_ENV}/Scripts/activate
+                        python app.py > deployed_output.txt
+                    """
+                    echo "Application deployed locally (output in deployed_output.txt)"
                 }
             }
         }
+
     }
 
     post {
