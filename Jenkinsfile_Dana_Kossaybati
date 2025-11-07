@@ -28,10 +28,14 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    sh "source ${VIRTUAL_ENV}/Scripts/activate && pytest"
+                    sh """
+                        source ${VIRTUAL_ENV}/Scripts/activate
+                        PYTHONPATH=. pytest
+                    """
                 }
             }
         }
+
 
         stage('Deploy') {
             steps {
